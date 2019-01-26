@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/iv_avatar"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginStart="@dimen/view_margin"
+        android:layout_marginTop="@dimen/view_margin"
+        android:layout_marginEnd="@dimen/view_margin"
+        android:layout_marginBottom="@dimen/view_margin"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/vd_placeholder"
+        android:contentDescription="@string/profile_picture" />
+
+    <TextView
+        android:id="@+id/tv_first_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/view_compressed_margin"
+        android:layout_marginTop="@dimen/view_compressed_margin"
+        android:layout_marginEnd="@dimen/view_compressed_margin"
+        android:textAppearance="@style/TextStyle.Heading"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintTop_toTopOf="@+id/iv_avatar"
+        tools:text="Charles" />
+
+    <TextView
+        android:id="@+id/tv_last_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/view_compressed_margin"
+        android:layout_marginTop="@dimen/view_compressed_margin"
+        android:layout_marginEnd="@dimen/view_compressed_margin"
+        android:textAppearance="@style/TextStyle.Comment"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintTop_toBottomOf="@+id/tv_first_name"
+        tools:text="Morris" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.3" />
+
+</android.support.constraint.ConstraintLayout>

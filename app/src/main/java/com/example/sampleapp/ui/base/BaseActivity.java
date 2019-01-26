@@ -1,0 +1,154 @@
+package com.example.sampleapp.ui.base;
+
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.example.sampleapp.MvpApp;
+import com.example.sampleapp.R;
+import com.example.sampleapp.di.component.ActivityComponent;
+import com.example.sampleapp.di.component.DaggerActivityComponent;
+import com.example.sampleapp.di.module.ActivityModule;
+import com.example.sampleapp.utils.CommonUtils;
+import com.example.sampleapp.utils.NetworkUtils;
+
+import butterknife.Unbinder;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
+
+public abstract class BaseActivity extends AppCompatActivity
+        implements MvpView, BaseFragment.Callback {
+
+    private ProgressDialog progressDialog;
+    private Unbinder unBinder;
+    private ActivityComponent activityComponent;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        //Instantiate ActivityComponent
+        activityComponent = DaggerActivityComponent.builder()
+                .activityModule(new ActivityModule(this))
+                .applicationComponent(((MvpApp) getApplication()).getApplicationComponent())
+                .build();
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
+
+    @Override
+    public void hideLoading() {
+        if (progressDialog != null && progressDialog.isShowing())
+            progressDialog.cancel();
+    }
+
+    @Override
+    public void showLoading() {
+        hideLoading();
+        progressDialog = CommonUtils.showLoadingDialog(this);
+    }
+
+    @Override
+    public void showMessage(String message) {
+        if (message != null)
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        else Toast.makeText(this, R.string.something_went_wrong, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showMessage(int resID) {
+        showMessage(getString(resID));
+    }
+
+    @Override
+    public void onError(String message) {
+        if (message != null)
+            showSnackbar(message);
+        else showSnackbar(getString(R.string.something_went_wrong));
+    }
+
+    @Override
+    public void onError(int resID) {
+        onError(getString(resID));
+    }
+
+    @Override
+    public void hideKeyboard() {
+        View view = this.getCurrentFocus();
+
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+
+    @Override
+    public boolean isNetworkConnected() {
+        if (NetworkUtils.isNetworkConnected(getApplicationContext()))
+            return true;
+        else {
+            onError(R.string.no_internet);
+            return false;
+        }
+    }
+
+    private void showSnackbar(String message) {
+        Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content),
+                message,
+                Snackbar.LENGTH_SHORT)
+                .setAction(R.string.retry, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        retryInternet();
+                    }
+                });
+
+        View view = snackbar.getView();
+
+        TextView snackTV = (TextView) view.findViewById(android.support.design.R.id.snackbar_text);
+        snackTV.setTextColor(ContextCompat.getColor(this, R.color.white));
+
+        snackbar.setDuration(Snackbar.LENGTH_INDEFINITE);
+        snackbar.show();
+    }
+
+    public ActivityComponent getActivityComponent() {
+        return activityComponent;
+    }
+
+    public void setUnBinder(Unbinder unBinder) {
+        this.unBinder = unBinder;
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (unBinder != null)
+            unBinder.unbind();
+        super.onDestroy();
+    }
+
+    protected abstract void setUp();
+
+    protected abstract void retryInternet();
+
+    @Override
+    public void onFragmentAttached() {
+
+    }
+
+    @Override
+    public void onFragmentDetached(String tag) {
+
+    }
+}
